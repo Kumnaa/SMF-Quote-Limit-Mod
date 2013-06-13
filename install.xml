@@ -3,15 +3,34 @@
 <!DOCTYPE modification SYSTEM "http://www.simplemachines.org/xml/modification">
 <modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
 	<id>kumnaa:quotelimitmod</id>
-	<version>1.0.1</version>
+	<version>1.1.0</version>
 
 	<file name="$sourcedir/Post.php">
+		<operation>
+			<search position="before"><![CDATA[$txt['error_' . $post_error] = sprintf($txt['error_' . $post_error], $modSettings['max_messageLength']);]]></search>
+			<add><![CDATA[
+				elseif ($post_error == 'nested_quotes')
+					$nested_quotes = 5;
+					if (isset($modSettings['kumnaa_nested_quotes']) && is_numeric($modSettings['kumnaa_nested_quotes'])) {
+						$nested_quotes = $modSettings['kumnaa_nested_quotes'];
+					} 
+
+					$txt['error_' . $post_error] = str_replace('%quotes%', $nested_quotes, $txt['error_' . $post_error]);
+			]]></add>
+		</operation>
 		<operation>
 			<search position="before"><![CDATA[$post_errors = array();]]></search>
 			<add><![CDATA[
 
+			$nested_quotes = 5;
+			if (isset($modSettings['kumnaa_nested_quotes']) && is_numeric($modSettings['kumnaa_nested_quotes'])) {
+				$nested_quotes = $modSettings['kumnaa_nested_quotes'];
+			}
+
+			$nested_quotes++;
+
 			$matches = null;
-			if (preg_match_all('/(\[quote((?!\[\/quote).)*){5,}/s', $_POST['message'], $matches) > 0) {
+			if (preg_match_all('/(\[quote((?!\[\/quote).)*){'. $nested_quotes .',}/s', $_POST['message'], $matches) > 0) {
                 $post_errors[] = 'nested_quotes';
 			}
 			]]></add>
@@ -24,7 +43,7 @@
 			<add><![CDATA[
 ### Quote Limiter
 // Used by: Errors
-$txt['error_nested_quotes'] = 'Only allowed 5 nested quotes per message.';]]></add>
+$txt['error_nested_quotes'] = 'Only allowed %quotes% nested quotes per message.';]]></add>
 		</operation>
 	</file>
 
