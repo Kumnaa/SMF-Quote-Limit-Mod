@@ -3,7 +3,7 @@
 <!DOCTYPE modification SYSTEM "http://www.simplemachines.org/xml/modification">
 <modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
 	<id>kumnaa:quotelimitmod</id>
-	<version>1.1.0</version>
+	<version>1.1.1</version>
 
 	<file name="$sourcedir/Post.php">
 		<operation>
@@ -12,7 +12,7 @@
 				elseif ($post_error == 'nested_quotes')
 					$nested_quotes = 5;
 					if (isset($modSettings['kumnaa_nested_quotes']) && is_numeric($modSettings['kumnaa_nested_quotes'])) {
-						$nested_quotes = $modSettings['kumnaa_nested_quotes'];
+						$nested_quotes = ($modSettings['kumnaa_nested_quotes'] > 0 ? $modSettings['kumnaa_nested_quotes'] : 9999);
 					} 
 
 					$txt['error_' . $post_error] = str_replace('%quotes%', $nested_quotes, $txt['error_' . $post_error]);
@@ -24,7 +24,7 @@
 
 			$nested_quotes = 5;
 			if (isset($modSettings['kumnaa_nested_quotes']) && is_numeric($modSettings['kumnaa_nested_quotes'])) {
-				$nested_quotes = $modSettings['kumnaa_nested_quotes'];
+				$nested_quotes = ($modSettings['kumnaa_nested_quotes'] > 0 ? $modSettings['kumnaa_nested_quotes'] : 9999);
 			}
 
 			$nested_quotes++;
@@ -37,13 +37,32 @@
 		</operation>
 	</file>
 
+	<file name="$sourcedir/ManageSettings.php">
+		<operation>
+			<search position="before"><![CDATA[
+		// Mod authors, add any settings UNDER this line. Include a comma at the end of the line and don't remove this statement!!]]></search>
+			<add><![CDATA[
+		array('int', 'kumnaa_nested_quotes', 2),
+		]]></add>
+		</operation>
+	</file>
+
 	<file name="$languagedir/Errors.english.php">
 		<operation>
-<search position="end" />
+			<search position="end" />
 			<add><![CDATA[
 ### Quote Limiter
 // Used by: Errors
 $txt['error_nested_quotes'] = 'Only allowed %quotes% nested quotes per message.';]]></add>
+		</operation>
+	</file>
+
+	<file name="$languagedir/Modifications.english.php">
+		<operation>
+			<search position="end" />
+			<add><![CDATA[
+$txt['kumnaa_nested_quotes'] = 'Number of nested quotes to allow (0 is unlimited)';
+]]></add>
 		</operation>
 	</file>
 
