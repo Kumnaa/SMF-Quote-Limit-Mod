@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="http://fustrate.com/dev/sources/Other/modification.xsl"?>
+<!DOCTYPE modification SYSTEM "http://www.simplemachines.org/xml/modification">
+<modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
+	<id>kumnaa:quotelimitmod</id>
+	<version>1.0.1</version>
+
+	<file name="$sourcedir/Post.php">
+		<operation>
+			<search position="before"><![CDATA[$post_errors = array();]]></search>
+			<add><![CDATA[
+
+			$matches = null;
+			if (preg_match_all('/(\[quote((?!\[\/quote).)*){5,}/s', $_POST['message'], $matches) > 0) {
+                $post_errors[] = 'nested_quotes';
+			}
+			]]></add>
+		</operation>
+	</file>
+
+	<file name="$languagedir/Errors.english.php">
+		<operation>
+<search position="end" />
+			<add><![CDATA[
+### Quote Limiter
+// Used by: Errors
+$txt['error_nested_quotes'] = 'Only allowed 5 nested quotes per message.';]]></add>
+		</operation>
+	</file>
+
+</modification>
